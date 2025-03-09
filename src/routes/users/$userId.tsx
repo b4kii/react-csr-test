@@ -24,27 +24,31 @@ export const Route = createFileRoute("/users/$userId")({
 });
 
 const userLoginFormSchema = z.object({
-  login: z.string().min(2, { message: "Username too short" }),
+  login: z.string()
+          .min(2, { message: "Username too short" })
+          .email({message: "Invalid email"}),
   password: z.string(),
 });
 
 type UserLoginForm = z.infer<typeof userLoginFormSchema>;
 
-const API_URL = "https://randomuser.me/api/";
+// const API_URL = "https://randomuser.me/api/";
+const API_URL = "http://localhost:3069/users";
 
 async function fetchUser() {
   try {
     const res = await fetch(API_URL);
 
     const data = await res.json();
-
-    return data.results[0];
+    
+    console.log(data);
+    // return data.results[0];
+    return data[0];
   } catch (err) {
     console.error(err);
     return null;
   }
 }
-
 
 function UserComponent() {
   const data = Route.useLoaderData();
@@ -83,10 +87,9 @@ function UserComponent() {
       console.log(data);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div>
@@ -113,7 +116,7 @@ function UserComponent() {
       <button onClick={() => refetch()}>
         {isFetching ? "Looooading.." : "Fetch some user"}
       </button>
-      <h1>{user?.name.first}</h1>
+      <h1>{user?.firstname}</h1>
     </div>
   );
 }

@@ -8,7 +8,11 @@ import path from "path";
 export default defineConfig({
     plugins: [
         TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
-        react(),
+        react({
+            babel: {
+                plugins: [["babel-plugin-react-compiler"]],
+            },
+        }),
         tailwindcss(),
     ],
     resolve: {

@@ -1,5 +1,5 @@
-import * as React from 'react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Suspense } from 'react'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -7,9 +7,9 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <React.Fragment>
+    <Suspense fallback="LOADING..">
       <div>nav</div>
       <Outlet />
-    </React.Fragment>
+    </Suspense>
   )
 }

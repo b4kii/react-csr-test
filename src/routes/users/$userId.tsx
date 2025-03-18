@@ -61,12 +61,7 @@ function UserComponent() {
     enabled: false
   });
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<UserLoginForm>({
+  const { register, handleSubmit, setError, formState: { errors }, } = useForm<UserLoginForm>({
     resolver: zodResolver(userLoginFormSchema),
     defaultValues: {
       login: "baki"

@@ -1,0 +1,10 @@
+
+    [ ] - zustand
+    [ ] - react hook forms - how to adapt server side validation
+    [ ] - i18n
+    [ ] - zod
+    [ ] - tanstack router
+    [ ] - tanstack query
+    [ ] - jwt
+    [ ] - roles
+    [ ] - shadcn

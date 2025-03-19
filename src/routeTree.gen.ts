@@ -8,15 +8,28 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as UsersUserIdImport } from './routes/users/$userId'
+import { Route as UsersLayoutImport } from './routes/users/_layout'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as UsersLayoutUserIdImport } from './routes/users/_layout.$userId'
+
+// Create Virtual Routes
+
+const UsersImport = createFileRoute('/users')()
 
 // Create/Update Routes
+
+const UsersRoute = UsersImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -24,10 +37,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const UsersUserIdRoute = UsersUserIdImport.update({
-  id: '/users/$userId',
-  path: '/users/$userId',
-  getParentRoute: () => rootRoute,
+const UsersLayoutRoute = UsersLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => UsersRoute,
 } as any)
 
 const authRegisterRoute = authRegisterImport.update({
@@ -40,6 +52,12 @@ const authLoginRoute = authLoginImport.update({
   id: '/(auth)/login',
   path: '/login',
   getParentRoute: () => rootRoute,
+} as any)
+
+const UsersLayoutUserIdRoute = UsersLayoutUserIdImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => UsersLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -67,30 +85,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
-    '/users/$userId': {
-      id: '/users/$userId'
-      path: '/users/$userId'
-      fullPath: '/users/$userId'
-      preLoaderRoute: typeof UsersUserIdImport
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersImport
       parentRoute: typeof rootRoute
+    }
+    '/users/_layout': {
+      id: '/users/_layout'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersLayoutImport
+      parentRoute: typeof UsersRoute
+    }
+    '/users/_layout/$userId': {
+      id: '/users/_layout/$userId'
+      path: '/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof UsersLayoutUserIdImport
+      parentRoute: typeof UsersLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface UsersLayoutRouteChildren {
+  UsersLayoutUserIdRoute: typeof UsersLayoutUserIdRoute
+}
+
+const UsersLayoutRouteChildren: UsersLayoutRouteChildren = {
+  UsersLayoutUserIdRoute: UsersLayoutUserIdRoute,
+}
+
+const UsersLayoutRouteWithChildren = UsersLayoutRoute._addFileChildren(
+  UsersLayoutRouteChildren,
+)
+
+interface UsersRouteChildren {
+  UsersLayoutRoute: typeof UsersLayoutRouteWithChildren
+}
+
+const UsersRouteChildren: UsersRouteChildren = {
+  UsersLayoutRoute: UsersLayoutRouteWithChildren,
+}
+
+const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/users/$userId': typeof UsersUserIdRoute
+  '/users': typeof UsersLayoutRouteWithChildren
+  '/users/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/users/$userId': typeof UsersUserIdRoute
+  '/users': typeof UsersLayoutRouteWithChildren
+  '/users/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRoutesById {
@@ -98,15 +154,24 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
-  '/users/$userId': typeof UsersUserIdRoute
+  '/users': typeof UsersRouteWithChildren
+  '/users/_layout': typeof UsersLayoutRouteWithChildren
+  '/users/_layout/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/users/$userId'
+  fullPaths: '/' | '/login' | '/register' | '/users' | '/users/$userId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/users/$userId'
-  id: '__root__' | '/' | '/(auth)/login' | '/(auth)/register' | '/users/$userId'
+  to: '/' | '/login' | '/register' | '/users' | '/users/$userId'
+  id:
+    | '__root__'
+    | '/'
+    | '/(auth)/login'
+    | '/(auth)/register'
+    | '/users'
+    | '/users/_layout'
+    | '/users/_layout/$userId'
   fileRoutesById: FileRoutesById
 }
 
@@ -114,14 +179,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
-  UsersUserIdRoute: typeof UsersUserIdRoute
+  UsersRoute: typeof UsersRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
-  UsersUserIdRoute: UsersUserIdRoute,
+  UsersRoute: UsersRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -137,7 +202,7 @@ export const routeTree = rootRoute
         "/",
         "/(auth)/login",
         "/(auth)/register",
-        "/users/$userId"
+        "/users"
       ]
     },
     "/": {
@@ -149,8 +214,22 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
     },
-    "/users/$userId": {
-      "filePath": "users/$userId.tsx"
+    "/users": {
+      "filePath": "users",
+      "children": [
+        "/users/_layout"
+      ]
+    },
+    "/users/_layout": {
+      "filePath": "users/_layout.tsx",
+      "parent": "/users",
+      "children": [
+        "/users/_layout/$userId"
+      ]
+    },
+    "/users/_layout/$userId": {
+      "filePath": "users/_layout.$userId.tsx",
+      "parent": "/users/_layout"
     }
   }
 }

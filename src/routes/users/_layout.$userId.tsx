@@ -12,7 +12,7 @@ const userSearchSchema = z.object({
 
 // type UserSearch = z.infer<typeof userSearchSchema>
 
-export const Route = createFileRoute("/users/$userId")({
+export const Route = createFileRoute("/users/_layout/$userId")({
   validateSearch: userSearchSchema,
   loaderDeps: ({ search: { q, asc, timestamp } }) => ({ q, asc, timestamp }),
   component: UserComponent,

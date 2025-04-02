@@ -13,8 +13,11 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TestingRouteImport } from './routes/testing/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as UsersIndexImport } from './routes/users/index'
 import { Route as UsersLayoutImport } from './routes/users/_layout'
+import { Route as TestingBakiImport } from './routes/testing/baki'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as UsersLayoutUserIdImport } from './routes/users/_layout.$userId'
@@ -31,15 +34,33 @@ const UsersRoute = UsersImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const TestingRouteRoute = TestingRouteImport.update({
+  id: '/testing',
+  path: '/testing',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
+const UsersIndexRoute = UsersIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UsersRoute,
+} as any)
+
 const UsersLayoutRoute = UsersLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => UsersRoute,
+} as any)
+
+const TestingBakiRoute = TestingBakiImport.update({
+  id: '/baki',
+  path: '/baki',
+  getParentRoute: () => TestingRouteRoute,
 } as any)
 
 const authRegisterRoute = authRegisterImport.update({
@@ -71,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/testing': {
+      id: '/testing'
+      path: '/testing'
+      fullPath: '/testing'
+      preLoaderRoute: typeof TestingRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/(auth)/login': {
       id: '/(auth)/login'
       path: '/login'
@@ -84,6 +112,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/register'
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
+    }
+    '/testing/baki': {
+      id: '/testing/baki'
+      path: '/baki'
+      fullPath: '/testing/baki'
+      preLoaderRoute: typeof TestingBakiImport
+      parentRoute: typeof TestingRouteImport
     }
     '/users': {
       id: '/users'
@@ -99,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersLayoutImport
       parentRoute: typeof UsersRoute
     }
+    '/users/': {
+      id: '/users/'
+      path: '/'
+      fullPath: '/users/'
+      preLoaderRoute: typeof UsersIndexImport
+      parentRoute: typeof UsersImport
+    }
     '/users/_layout/$userId': {
       id: '/users/_layout/$userId'
       path: '/$userId'
@@ -110,6 +152,18 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface TestingRouteRouteChildren {
+  TestingBakiRoute: typeof TestingBakiRoute
+}
+
+const TestingRouteRouteChildren: TestingRouteRouteChildren = {
+  TestingBakiRoute: TestingBakiRoute,
+}
+
+const TestingRouteRouteWithChildren = TestingRouteRoute._addFileChildren(
+  TestingRouteRouteChildren,
+)
 
 interface UsersLayoutRouteChildren {
   UsersLayoutUserIdRoute: typeof UsersLayoutUserIdRoute
@@ -125,58 +179,87 @@ const UsersLayoutRouteWithChildren = UsersLayoutRoute._addFileChildren(
 
 interface UsersRouteChildren {
   UsersLayoutRoute: typeof UsersLayoutRouteWithChildren
+  UsersIndexRoute: typeof UsersIndexRoute
 }
 
 const UsersRouteChildren: UsersRouteChildren = {
   UsersLayoutRoute: UsersLayoutRouteWithChildren,
+  UsersIndexRoute: UsersIndexRoute,
 }
 
 const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/testing': typeof TestingRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/testing/baki': typeof TestingBakiRoute
   '/users': typeof UsersLayoutRouteWithChildren
+  '/users/': typeof UsersIndexRoute
   '/users/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/testing': typeof TestingRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
-  '/users': typeof UsersLayoutRouteWithChildren
+  '/testing/baki': typeof TestingBakiRoute
+  '/users': typeof UsersIndexRoute
   '/users/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/testing': typeof TestingRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/testing/baki': typeof TestingBakiRoute
   '/users': typeof UsersRouteWithChildren
   '/users/_layout': typeof UsersLayoutRouteWithChildren
+  '/users/': typeof UsersIndexRoute
   '/users/_layout/$userId': typeof UsersLayoutUserIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/users' | '/users/$userId'
+  fullPaths:
+    | '/'
+    | '/testing'
+    | '/login'
+    | '/register'
+    | '/testing/baki'
+    | '/users'
+    | '/users/'
+    | '/users/$userId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/users' | '/users/$userId'
+  to:
+    | '/'
+    | '/testing'
+    | '/login'
+    | '/register'
+    | '/testing/baki'
+    | '/users'
+    | '/users/$userId'
   id:
     | '__root__'
     | '/'
+    | '/testing'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/testing/baki'
     | '/users'
     | '/users/_layout'
+    | '/users/'
     | '/users/_layout/$userId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TestingRouteRoute: typeof TestingRouteRouteWithChildren
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   UsersRoute: typeof UsersRouteWithChildren
@@ -184,6 +267,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TestingRouteRoute: TestingRouteRouteWithChildren,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   UsersRoute: UsersRouteWithChildren,
@@ -200,6 +284,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/testing",
         "/(auth)/login",
         "/(auth)/register",
         "/users"
@@ -208,16 +293,27 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/testing": {
+      "filePath": "testing/route.tsx",
+      "children": [
+        "/testing/baki"
+      ]
+    },
     "/(auth)/login": {
       "filePath": "(auth)/login.tsx"
     },
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
     },
+    "/testing/baki": {
+      "filePath": "testing/baki.tsx",
+      "parent": "/testing"
+    },
     "/users": {
       "filePath": "users",
       "children": [
-        "/users/_layout"
+        "/users/_layout",
+        "/users/"
       ]
     },
     "/users/_layout": {
@@ -226,6 +322,10 @@ export const routeTree = rootRoute
       "children": [
         "/users/_layout/$userId"
       ]
+    },
+    "/users/": {
+      "filePath": "users/index.tsx",
+      "parent": "/users"
     },
     "/users/_layout/$userId": {
       "filePath": "users/_layout.$userId.tsx",

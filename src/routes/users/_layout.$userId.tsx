@@ -13,9 +13,9 @@ const userSearchSchema = z.object({
 // type UserSearch = z.infer<typeof userSearchSchema>
 
 export const Route = createFileRoute("/users/_layout/$userId")({
+  component: UserComponent,
   validateSearch: userSearchSchema,
   loaderDeps: ({ search: { q, asc, timestamp } }) => ({ q, asc, timestamp }),
-  component: UserComponent,
   loader: async ({ deps, params }) => {
     return `This is data from loader function params: ${params.userId}\nsearch: ${deps.q}, ${deps.asc}, ${deps.timestamp}`;
   },

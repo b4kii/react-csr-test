@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUserStore } from "@/features/users/users.store";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
@@ -33,17 +35,30 @@ function RouteComponent() {
   return (
     <div>
       <div>
-        <button onClick={handleClick}>Increment</button>
+        <Button onClick={handleClick}>Increment</Button>
+      </div>
+      <div>
+        {/* <button onClick={handleClick}>Increment</button> */}
         Zustand {userName}
         <div>
           { age }
         </div>
       </div>
-    <select id="languages" onChange={handleChangeLanguage}>
-      <option value="pl">Polski</option>
-      <option value="en">Angielski</option>
-      <option value="es">Hiszpanski</option>
-    </select>
+
+    <Select>
+      <SelectTrigger>
+        <SelectValue placeholder="Wybierz język" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Languages</SelectLabel>
+          <SelectItem value="pl">Polski</SelectItem>
+          <SelectItem value="en">Angielski</SelectItem>
+          <SelectItem value="es">Hiszpański</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+
       <h1>{t("title")}</h1>
       <div>Hello "/"!</div>
       <div>

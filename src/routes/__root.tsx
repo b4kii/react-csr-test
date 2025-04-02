@@ -8,8 +8,12 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <Suspense fallback="LOADING..">
-      <div>nav</div>
-      <Outlet />
+      <header className="bg-zinc-200 h-10">
+        some header
+      </header>
+      <div className="w-[1000px] mx-auto">
+        <Outlet />
+      </div>
     </Suspense>
   )
 }
